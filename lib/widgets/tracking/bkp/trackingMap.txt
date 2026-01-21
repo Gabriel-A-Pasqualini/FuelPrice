@@ -1,0 +1,188 @@
+import 'dart:async';
+import 'package:calculo_combustivel/helper/colors_helper.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
+
+class TrackingMapaPage extends StatefulWidget {
+  const TrackingMapaPage({super.key});
+
+  @override
+  State<TrackingMapaPage> createState() => _TrackingMapaPageState();
+}
+
+class _TrackingMapaPageState extends State<TrackingMapaPage> {
+  final MapController _mapController = MapController();
+  final FlutterBackgroundService _service = FlutterBackgroundService();
+
+  final appColor = AppColors.appMainColor;
+
+  final List<LatLng> _trajeto = [];
+  StreamSubscription? _subscription;
+
+  bool _trackingAtivo = false;
+
+  Future<bool> _garantirPermissao() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      await Geolocator.openLocationSettings();
+      return false;
+    }
+
+    LocationPermission permission =
+        await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      await Geolocator.openAppSettings();
+      return false;
+    }
+
+    return permission == LocationPermission.always ||
+        permission == LocationPermission.whileInUse;
+  }
+
+  Future<void> _iniciarTracking() async {
+    final permitido = await _garantirPermissao();
+    if (!permitido) return;
+
+    await _service.startService();
+    _escutarLocalizacao();
+
+    setState(() {
+      _trackingAtivo = true;
+    });
+  }
+
+  void _escutarLocalizacao() {
+    _subscription?.cancel();
+    _subscription = _service.on('location').listen((event) {
+      if (event == null) return;
+
+      final ponto = LatLng(
+        event['lat'] as double,
+        event['lng'] as double,
+      );
+
+      setState(() {
+        _trajeto.add(ponto);
+      });
+
+      _mapController.move(ponto, 17);
+    });
+  }
+
+  /// ⏹ PARAR TRACKING
+  void _pararTracking() {
+    _service.invoke('stopService');
+    _subscription?.cancel();
+
+    setState(() {
+      _trackingAtivo = false;
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: appColor,
+        centerTitle: true,
+        title: const Text(
+          "Rastreamento de percurso",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        actions: [
+          if (_trackingAtivo)
+            IconButton(
+              icon: const Icon(Icons.stop_circle, color: Colors.white),
+              tooltip: 'Parar rastreamento',
+              onPressed: _pararTracking,
+            )
+        ],
+      ),
+      body: FlutterMap(
+        mapController: _mapController,
+        options: const MapOptions(
+          initialCenter: LatLng(-22.755703, -47.318630),
+          initialZoom: 16,
+        ),
+        children: [
+          TileLayer(
+            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            userAgentPackageName: 'com.seu.app',
+          ),
+          PolylineLayer(
+            polylines: [
+              Polyline(
+                points: _trajeto,
+                strokeWidth: 4,
+                color: Colors.blue,
+              ),
+            ],
+          ),
+          MarkerLayer(
+            markers: _trajeto.isEmpty
+                ? []
+                : [
+                    Marker(
+                      point: _trajeto.last,
+                      width: 40,
+                      height: 40,
+                      child: const Icon(
+                        Icons.my_location,
+                        color: Colors.red,
+                        size: 30,
+                      ),
+                    ),
+                  ],
+          ),
+        ],
+      ),
+
+      floatingActionButton: !_trackingAtivo
+          ? FloatingActionButton.extended(
+              backgroundColor: appColor,
+              icon: const Icon(
+                Icons.play_arrow, 
+                color: Colors.white               
+              ),
+              label: const Text(
+                "Iniciar rastreamento",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),                
+                ),
+              onPressed: _iniciarTracking,
+            )
+          : null,
+
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(12),
+        color: Colors.grey[100],
+        child: Text(
+          _trajeto.isEmpty
+              ? "Aguardando localização..."
+              : "Pontos registrados: ${_trajeto.length}",
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+}

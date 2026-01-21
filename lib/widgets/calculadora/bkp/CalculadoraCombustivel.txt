@@ -1,0 +1,351 @@
+import 'package:calculo_combustivel/helper/colors_helper.dart';
+import 'package:flutter/material.dart';
+
+class CalculadoraCombustivelWidget extends StatefulWidget {
+  const CalculadoraCombustivelWidget({super.key});
+
+  @override
+  State<CalculadoraCombustivelWidget> createState() =>
+      _CalculadoraCombustivelWidgetState();
+}
+
+class _CalculadoraCombustivelWidgetState
+  extends State<CalculadoraCombustivelWidget> {
+  final _etanolController = TextEditingController();
+  final _gasolinaController = TextEditingController();
+  final _valorAbastecerController = TextEditingController();
+  final _focusEtanol = FocusNode();
+  final appColor = AppColors.appMainColor;
+
+  Map<String, dynamic>? resultado;
+  bool calculado = false;
+
+  void calcular() {
+    final precoEtanol =
+        double.tryParse(_etanolController.text.replaceAll(',', '.')) ?? 0;
+    final precoGasolina =
+        double.tryParse(_gasolinaController.text.replaceAll(',', '.')) ?? 0;
+    final valorAbastecer =
+        double.tryParse(_valorAbastecerController.text.replaceAll(',', '.')) ??
+            0;
+
+    if (precoEtanol == 0 || precoGasolina == 0 || valorAbastecer == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("⚠️ Preencha todos os campos corretamente.")),
+      );
+      return;
+    }
+
+    // Consumo HB20 1.0
+    const consumoEtanolCidade = 9.1;
+    const consumoEtanolEstrada = 10.1;
+    const consumoGasolinaCidade = 12.8;
+    const consumoGasolinaEstrada = 14.6;
+    const tanqueLitros = 50.0;
+
+    final relacao = precoEtanol / precoGasolina;
+
+    // Km com o valor abastecido
+    final kmEtanolCidade = (valorAbastecer / precoEtanol) * consumoEtanolCidade;
+    final kmEtanolEstrada =
+        (valorAbastecer / precoEtanol) * consumoEtanolEstrada;
+    final kmGasolinaCidade =
+        (valorAbastecer / precoGasolina) * consumoGasolinaCidade;
+    final kmGasolinaEstrada =
+        (valorAbastecer / precoGasolina) * consumoGasolinaEstrada;
+
+    // Custo por km
+    final custoKmEtanolCidade = precoEtanol / consumoEtanolCidade;
+    final custoKmEtanolEstrada = precoEtanol / consumoEtanolEstrada;
+    final custoKmGasolinaCidade = precoGasolina / consumoGasolinaCidade;
+    final custoKmGasolinaEstrada = precoGasolina / consumoGasolinaEstrada;
+
+    // Km com tanque cheio
+    final tanqueKmEtanolCidade = tanqueLitros * consumoEtanolCidade;
+    final tanqueKmEtanolEstrada = tanqueLitros * consumoEtanolEstrada;
+    final tanqueKmGasolinaCidade = tanqueLitros * consumoGasolinaCidade;
+    final tanqueKmGasolinaEstrada = tanqueLitros * consumoGasolinaEstrada;
+
+    // Economia
+    final economiaCidadeKm = (kmGasolinaCidade - kmEtanolCidade).abs();
+    final economiaEstradaKm = (kmGasolinaEstrada - kmEtanolEstrada).abs();
+
+    final economiaCidadeReais = economiaCidadeKm *
+        (custoKmEtanolCidade < custoKmGasolinaCidade
+            ? custoKmEtanolCidade
+            : custoKmGasolinaCidade);
+    final economiaEstradaReais = economiaEstradaKm *
+        (custoKmEtanolEstrada < custoKmGasolinaEstrada
+            ? custoKmEtanolEstrada
+            : custoKmGasolinaEstrada);
+
+    final melhorCombustivel = relacao < 0.7 ? "ETANOL" : "GASOLINA";
+
+    setState(() {
+      resultado = {
+        "relacao": relacao,
+        "melhor": melhorCombustivel,
+        "valor": valorAbastecer,
+        "km": {
+          "etanolCidade": kmEtanolCidade,
+          "etanolEstrada": kmEtanolEstrada,
+          "gasolinaCidade": kmGasolinaCidade,
+          "gasolinaEstrada": kmGasolinaEstrada,
+        },
+        "custoKm": {
+          "etanolCidade": custoKmEtanolCidade,
+          "etanolEstrada": custoKmEtanolEstrada,
+          "gasolinaCidade": custoKmGasolinaCidade,
+          "gasolinaEstrada": custoKmGasolinaEstrada,
+        },
+        "tanque": {
+          "etanolCidade": tanqueKmEtanolCidade,
+          "etanolEstrada": tanqueKmEtanolEstrada,
+          "gasolinaCidade": tanqueKmGasolinaCidade,
+          "gasolinaEstrada": tanqueKmGasolinaEstrada,
+        },
+        "economia": {
+          "cidadeKm": economiaCidadeKm,
+          "estradaKm": economiaEstradaKm,
+          "cidadeR": economiaCidadeReais,
+          "estradaR": economiaEstradaReais,
+        }
+      };
+      calculado = true;
+    });
+  }
+
+  void limpar() {
+    setState(() {
+      _etanolController.clear();
+      _gasolinaController.clear();
+      _valorAbastecerController.clear();
+      resultado = null;
+      calculado = false;
+    });
+    FocusScope.of(context).requestFocus(_focusEtanol);
+  }
+
+  Widget cardTitulo(String titulo, IconData icone, {Color? cor}) {
+    return Row(
+      children: [
+        Icon(icone, color: cor ?? appColor),
+        const SizedBox(width: 8),
+        Text(
+          titulo,
+          style: TextStyle(
+            color: cor ?? appColor,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget bloco(String titulo, List<Widget> conteudo, IconData icone, {Color? cor}) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(13.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [cardTitulo(titulo, icone, cor: cor), const SizedBox(height: 5), ...conteudo],
+        ),
+      ),
+    );
+  }
+  Widget rodapeBonito() {
+    return Column(
+      children: [
+        const SizedBox(height: 12),
+        Divider(color: Colors.grey[400], thickness: 1.2),
+        const SizedBox(height: 8),
+        Text(
+          "🚗 Cálculos baseados no consumo médio do HB20 1.0",
+          style: TextStyle(fontSize: 13, color: Colors.grey[700], fontStyle: FontStyle.italic),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 20),
+      ],
+    );
+  }
+  @override
+  Widget build(BuildContext context) {
+
+    return Scaffold(
+      appBar: AppBar(
+        title: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Calculadora de Abastecimento - HB20",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20
+                ),
+              ),
+              Container(
+                width: 4,
+                height: 24,
+                color: appColor,
+                margin: const EdgeInsets.only(left: 28), 
+              ),        
+            ],
+          ),
+        ),
+        backgroundColor: appColor,
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: ListView(
+          children: [
+            const SizedBox(height: 10),
+            TextField(              
+              controller: _etanolController,
+              focusNode: _focusEtanol,
+              decoration: const InputDecoration(   
+                filled: true,
+                fillColor: Colors.white,     
+                labelText: "Preço do Etanol (R\$)",
+                labelStyle: TextStyle(),
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: _gasolinaController,
+              decoration: const InputDecoration(
+                filled: true,
+                fillColor: Colors.white,  
+                labelText: "Preço da Gasolina (R\$)",
+                labelStyle: TextStyle(),             
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: _valorAbastecerController,
+              decoration: const InputDecoration(
+                filled: true,
+                fillColor: Colors.white,                  
+                labelText: "Valor a abastecer (R\$)",
+                labelStyle: TextStyle(),             
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 20),
+
+            // Botões lado a lado
+            Row(
+              children: [
+                Expanded( 
+                  child: ElevatedButton.icon( 
+                    onPressed: calcular, 
+                    icon: const Icon(
+                      Icons.calculate, 
+                      color: Colors.white
+                    ), 
+                    label: const Text(
+                      "Calcular", 
+                      style: TextStyle(
+                        fontSize: 18, 
+                        color: Colors.white
+                      )
+                    ), 
+                    style: ElevatedButton.styleFrom( 
+                      backgroundColor: appColor, 
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 14
+                      ), 
+                      shape: RoundedRectangleBorder( 
+                      borderRadius: BorderRadius.circular(12)), 
+                    ), 
+                  ), 
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: limpar,
+                    icon: const Icon(Icons.clear, color: Colors.white),
+                    label: const Text("Limpar",
+                      style: TextStyle(fontSize: 18, color: Colors.white)
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red[700],
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 10),
+
+            if (calculado && resultado != null) ...[
+              bloco("Resumo Geral", [
+                Text("Relação Etanol/Gasolina: ${resultado!['relacao'].toStringAsFixed(2)}"),
+                Text.rich(
+                  TextSpan(
+                    text: "Melhor pela regra do 0.7: ",
+                    style: const TextStyle(fontSize: 18),
+                    children: [
+                      TextSpan(
+                        text: resultado!['melhor'],
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ], Icons.local_gas_station, cor: appColor),
+
+              bloco("Com o valor abastecido (R\$ ${resultado!['valor'].toStringAsFixed(2)})", [
+                Text("Etanol - Cidade: ${resultado!['km']['etanolCidade'].toStringAsFixed(1)} km"),
+                Text("Etanol - Estrada: ${resultado!['km']['etanolEstrada'].toStringAsFixed(1)} km"),
+                Text("Gasolina - Cidade: ${resultado!['km']['gasolinaCidade'].toStringAsFixed(1)} km"),
+                Text("Gasolina - Estrada: ${resultado!['km']['gasolinaEstrada'].toStringAsFixed(1)} km"),
+              ], Icons.directions_car, cor: Colors.orange[800]),
+
+              bloco("Custo por KM", [
+                Text("Etanol - Cidade: R\$ ${resultado!['custoKm']['etanolCidade'].toStringAsFixed(2)}"),
+                Text("Etanol - Estrada: R\$ ${resultado!['custoKm']['etanolEstrada'].toStringAsFixed(2)}"),
+                Text("Gasolina - Cidade: R\$ ${resultado!['custoKm']['gasolinaCidade'].toStringAsFixed(2)}"),
+                Text("Gasolina - Estrada: R\$ ${resultado!['custoKm']['gasolinaEstrada'].toStringAsFixed(2)}"),
+              ], Icons.speed, cor: Colors.blue[800]),
+
+              bloco("Km com TANQUE CHEIO (50L)", [
+                Text("Etanol - Cidade: ${resultado!['tanque']['etanolCidade'].toStringAsFixed(1)} km"),
+                Text("Etanol - Estrada: ${resultado!['tanque']['etanolEstrada'].toStringAsFixed(1)} km"),
+                Text("Gasolina - Cidade: ${resultado!['tanque']['gasolinaCidade'].toStringAsFixed(1)} km"),
+                Text("Gasolina - Estrada: ${resultado!['tanque']['gasolinaEstrada'].toStringAsFixed(1)} km"),
+              ], Icons.local_taxi, cor: Colors.teal[800]),
+
+              bloco("Economia no valor abastecido", [
+                Text("Cidade: ${resultado!['economia']['cidadeKm'].toStringAsFixed(1)} km → "
+                    "R\$ ${resultado!['economia']['cidadeR'].toStringAsFixed(2)}"),
+                Text("Estrada: ${resultado!['economia']['estradaKm'].toStringAsFixed(1)} km → "
+                    "R\$ ${resultado!['economia']['estradaR'].toStringAsFixed(2)}"),
+              ], Icons.savings, cor: Colors.purple[800]),
+              rodapeBonito(),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
