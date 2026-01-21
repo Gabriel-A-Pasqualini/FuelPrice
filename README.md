@@ -1,16 +1,25 @@
-# fuelPrice
+FuelPrice - Fuel Calculator App
 
-A new Flutter project.
+FuelPrice is a Flutter mobile application designed to help users calculate fuel consumption, track vehicle information, and manage refueling costs efficiently. The app provides real-time location services, vehicle management, and tracking features, all integrated into an easy-to-use interface.
 
-## Getting Started
+Key Features
 
-This project is a starting point for a Flutter application.
+Fuel Consumption Calculator: Quickly calculate fuel efficiency and cost for your vehicle.
 
-A few resources to get you started if this is your first Flutter project:
+Vehicle Management: Add, view, and manage multiple vehicles.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Location Services: Access maps to track fueling stations and routes.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Tracking: Monitor fuel usage and vehicle history over time.
+
+Responsive Design: Optimized for different screen sizes.
+
+Technologies
+
+Flutter & Dart
+
+Google Maps / Geolocation services
+
+Material Design
+
+State management and navigation using Flutter best practices
