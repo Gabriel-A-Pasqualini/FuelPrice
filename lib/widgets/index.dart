@@ -1,8 +1,8 @@
 
-import 'package:FuelPrice/helper/colors_helper.dart';
-import 'package:FuelPrice/widgets/calculadora/view/calculadora_view.dart';
-import 'package:FuelPrice/widgets/localizacao/view/maps_view.dart';
-import 'package:FuelPrice/widgets/veiculo/view/veiculo_view.dart';
+import 'package:fuelprice/helper/colors_helper.dart';
+import 'package:fuelprice/widgets/calculadora/view/calculadora_view.dart';
+import 'package:fuelprice/widgets/localizacao/view/maps_view.dart';
+import 'package:fuelprice/widgets/veiculo/view/veiculo_view.dart';
 import 'package:flutter/material.dart';
 
 import 'tracking/view/tracking_view.dart';
