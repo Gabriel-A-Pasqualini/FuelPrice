@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 
 // Definição das cores do app
 class AppColors {
-  static const Color appMainColor = Color(0xFF1B5E20); // equivalente a Colors.green[900]
-  static const Color secondary = Color(0xFFE8F5E9); // exemplo de fundo claro
-  static const Color accent = Colors.orange; // cor de destaque
-  static const Color error = Colors.red;
+  static const Color accentColor = Color(0xFF1B5E20);
+
+  static const Color primaryColor = Color(0xFF2EC4B6);
+  static const Color secondaryColor = Color(0xFF1F6F8B);
+  static const Color appMainColor = Color(0xFFF39C12);
+  static const Color backgroundColor = Color(0xFFF5F7FA);
+  static const Color darkBackground = Color(0xFF0E2A3A);
 }

@@ -1,4 +1,4 @@
-import 'package:calculo_combustivel/helper/colors_helper.dart';
+import 'package:FuelPrice/helper/colors_helper.dart';
 import 'package:flutter/material.dart';
 
 class CalculadoraCombustivelWidget extends StatefulWidget {

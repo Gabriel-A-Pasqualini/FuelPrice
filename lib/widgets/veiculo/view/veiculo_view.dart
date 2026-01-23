@@ -1,5 +1,5 @@
-import 'package:calculo_combustivel/helper/colors_helper.dart';
-import 'package:calculo_combustivel/widgets/veiculo/controller/veiculo_controller.dart';
+import 'package:FuelPrice/helper/colors_helper.dart';
+import 'package:FuelPrice/widgets/veiculo/controller/veiculo_controller.dart';
 import 'package:flutter/material.dart';
 
 class VeiculoWidget extends StatefulWidget {

@@ -1,5 +1,5 @@
 
-import 'package:calculo_combustivel/helper/mapa_localizacao_helper.dart';
+import 'package:FuelPrice/helper/mapa_localizacao_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 

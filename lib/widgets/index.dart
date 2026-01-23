@@ -1,8 +1,8 @@
 
-import 'package:calculo_combustivel/helper/colors_helper.dart';
-import 'package:calculo_combustivel/widgets/calculadora/view/calculadora_view.dart';
-import 'package:calculo_combustivel/widgets/localizacao/view/maps_view.dart';
-import 'package:calculo_combustivel/widgets/veiculo/view/veiculo_view.dart';
+import 'package:FuelPrice/helper/colors_helper.dart';
+import 'package:FuelPrice/widgets/calculadora/view/calculadora_view.dart';
+import 'package:FuelPrice/widgets/localizacao/view/maps_view.dart';
+import 'package:FuelPrice/widgets/veiculo/view/veiculo_view.dart';
 import 'package:flutter/material.dart';
 
 import 'tracking/view/tracking_view.dart';

@@ -1,6 +1,7 @@
-import 'package:calculo_combustivel/helper/colors_helper.dart';
-import 'package:calculo_combustivel/services/location_background_service.dart';
-import 'package:calculo_combustivel/widgets/index.dart';
+
+import 'package:FuelPrice/helper/colors_helper.dart';
+import 'package:FuelPrice/services/location_background_service.dart';
+import 'package:FuelPrice/widgets/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 

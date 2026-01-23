@@ -1,8 +1,8 @@
-import 'package:calculo_combustivel/widgets/tracking/controller/tracking_controller.dart';
+import 'package:FuelPrice/widgets/tracking/controller/tracking_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:calculo_combustivel/helper/colors_helper.dart';
+import 'package:FuelPrice/helper/colors_helper.dart';
 
 class TrackingMapaPage extends StatefulWidget {
   const TrackingMapaPage({super.key});
