@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fuelprice/helper/colors_helper.dart';
 import 'package:fuelprice/widgets/calculadora/view/calculadora_view.dart';
-import 'package:fuelprice/widgets/index/view/test/fuel_compare_card.dart';
-import 'package:fuelprice/widgets/index/view/test/fuel_gauge_widget.dart';
+import 'package:fuelprice/widgets/index/view/widgets/fuel_compare_card.dart';
+import 'package:fuelprice/widgets/index/view/widgets/fuel_gauge_widget.dart';
 import 'package:fuelprice/widgets/index/view/widgets/fuel_summary_card.dart';
 import 'package:fuelprice/widgets/index/view/widgets/header_widget.dart';
 import 'package:fuelprice/widgets/tracking/view/tracking_view.dart';
