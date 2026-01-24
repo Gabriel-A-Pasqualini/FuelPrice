@@ -12,6 +12,7 @@
 .swiftpm/
 migrate_working_dir/
 .fuelprice-keystore.jks
+.sematica_git.txt
 
 # IntelliJ related
 *.iml

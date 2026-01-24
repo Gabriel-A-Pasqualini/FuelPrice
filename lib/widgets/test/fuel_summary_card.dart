@@ -17,10 +17,26 @@ class FuelSummaryCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ListTile(
         leading: const Icon(Icons.local_gas_station),
-        title: Text("Faltam $diasRestantes dias para abastecer"),
+        title: Text(
+          "Faltam $diasRestantes dias para abastecer",
+          style: TextStyle(
+            fontSize: 22, 
+            fontWeight: FontWeight.bold,
+            color: diasRestantes <= 1
+                ? Colors.red
+                : diasRestantes <= 3
+                    ? Colors.orange
+                    : Colors.green,
+                        
+          ),
+        ),
         subtitle: Text(
           "Estimativa: R\$ ${estimativa.toStringAsFixed(2)}",
-          style: TextStyle(color: AppColors.primary),
+          style: TextStyle(
+            color: AppColors.primary,
+            fontSize: 20, 
+            fontWeight: FontWeight.bold,            
+          ),
         ),
       ),
     );
