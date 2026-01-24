@@ -1,7 +1,7 @@
 
 import 'package:fuelprice/helper/colors_helper.dart';
 import 'package:fuelprice/services/location_background_service.dart';
-import 'package:fuelprice/widgets/index.dart';
+import 'package:fuelprice/widgets/index/view/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 

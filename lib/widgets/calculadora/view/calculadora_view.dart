@@ -2,7 +2,7 @@ import 'package:fuelprice/widgets/calculadora/controller/calculadora_controller.
 import 'package:flutter/material.dart';
 import 'package:fuelprice/helper/colors_helper.dart';
 import 'package:fuelprice/widgets/calculadora/input/smooth_input.dart';
-import 'package:fuelprice/widgets/test/header_widget.dart';
+import 'package:fuelprice/widgets/index/view/widgets/header_widget.dart';
 
 class CalculadoraCombustivelWidget extends StatefulWidget {
   const CalculadoraCombustivelWidget({super.key});
