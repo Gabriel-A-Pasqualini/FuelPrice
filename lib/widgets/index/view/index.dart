@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:fuelprice/helper/colors_helper.dart';
 import 'package:fuelprice/widgets/calculadora/view/calculadora_view.dart';
+import 'package:fuelprice/widgets/index/controller/index_controller.dart';
 import 'package:fuelprice/widgets/index/view/widgets/fuel_compare_card.dart';
 import 'package:fuelprice/widgets/index/view/widgets/fuel_gauge_widget.dart';
 import 'package:fuelprice/widgets/index/view/widgets/fuel_summary_card.dart';
 import 'package:fuelprice/widgets/index/view/widgets/header_widget.dart';
 import 'package:fuelprice/widgets/tracking/view/tracking_view.dart';
+import 'package:fuelprice/widgets/veiculo/view/veiculo_view.dart';
 
 class IndexPage extends StatefulWidget {
   const IndexPage({super.key});
@@ -16,7 +18,7 @@ class IndexPage extends StatefulWidget {
 
 class _IndexPage extends State<IndexPage> {
   int _currentIndex = 0;
-  String nome = "Gabriel";
+  late final IndexController controller;
 
   late final List<Widget> _pages;
 
@@ -24,39 +26,73 @@ class _IndexPage extends State<IndexPage> {
   void initState() {
     super.initState();
 
+    controller = IndexController();
+    controller.carregarDados();
+    controller.carregarPrecos();
+
     _pages = [
       _homePage(),
       const CalculadoraCombustivelWidget(),
       const TrackingMapaPage(),
+      const VeiculoWidget(),
       const Center(child: Text("Mais")),
     ];
   }
 
   Widget _homePage() {
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            HeaderWidget(
-              titulo: 'Olá, $nome!',
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, _) {
+        if (controller.carregando) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        return SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [              
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: HeaderWidget(
+                    titulo: 'Olá, ${controller.nomeUsuario}!'
+                  ),
+                ),
+
+                IconButton(
+                  icon: const Icon(Icons.settings, color: Colors.grey),
+                  onPressed: () {
+                    _abrirAjusteTanque(context, controller);
+                  },
+                ),                   
+                const SizedBox(height: 10),               
+
+                FuelGaugeWidget(
+                  nivel: controller.nivelTanqueAtual,
+                  modeloCarro: controller.modeloCarro,
+                  porcentagemTanque: controller.porcentagemTanque,
+                ),
+
+                const SizedBox(height: 7),
+
+                FuelSummaryCard(
+                  diasRestantes: controller.diasRestantes,
+                  estimativa: controller.estimativaAbastecimento,
+                ),
+
+                const SizedBox(height: 16),
+                FuelCompareCard(
+                  alcoolPreco: controller.precoEtanol,
+                  gasolinaPreco: controller.precoGasolina, 
+                  litrosTanque: controller.capacidadeTanque,
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
-            FuelGaugeWidget(
-              nivel: 0.4,
-              modeloCarro: "HB20 Sense 2021", 
-              porcentagemTanque: 40,
-            ),
-            const SizedBox(height: 16),
-            FuelSummaryCard(
-              diasRestantes: 5,
-              estimativa: 280,
-            ),
-            const SizedBox(height: 16),
-            FuelCompareCard(),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -90,6 +126,10 @@ class _IndexPage extends State<IndexPage> {
             label: "Mapas",
           ),
           BottomNavigationBarItem(
+            icon: Icon(Icons.directions_car_rounded),
+            label: "Mapas",
+          ),          
+          BottomNavigationBarItem(
             icon: Icon(Icons.more_horiz),
             label: "Mais",
           ),
@@ -97,4 +137,59 @@ class _IndexPage extends State<IndexPage> {
       ),
     );
   }
+
+  void _abrirAjusteTanque(
+    BuildContext context,
+    IndexController controller,
+  ) {
+    final TextEditingController litrosController =
+        TextEditingController(text: controller.litrosAtuais.toString());
+
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text(
+            'Quantidade atual no tanque',
+            textAlign: TextAlign.center,
+          ),
+          content: TextField(
+            controller: litrosController,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              labelText: 'Litros atuais',
+              hintText:
+                  'Máx: ${controller.capacidadeTanque.toStringAsFixed(0)} L',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          actionsAlignment: MainAxisAlignment.spaceBetween,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final litros = double.tryParse(litrosController.text);
+
+                controller.carregarPrecos();
+
+                if (litros != null) {
+                  controller.atualizarLitrosAtuais(litros);
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text('Salvar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
 }

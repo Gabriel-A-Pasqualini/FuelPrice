@@ -20,7 +20,7 @@ class FuelSummaryCard extends StatelessWidget {
         title: Text(
           "Faltam $diasRestantes dias para abastecer",
           style: TextStyle(
-            fontSize: 22, 
+            fontSize: 17, 
             fontWeight: FontWeight.bold,
             color: diasRestantes <= 1
                 ? Colors.red
@@ -34,7 +34,7 @@ class FuelSummaryCard extends StatelessWidget {
           "Estimativa: R\$ ${estimativa.toStringAsFixed(2)}",
           style: TextStyle(
             color: AppColors.primary,
-            fontSize: 20, 
+            fontSize: 15, 
             fontWeight: FontWeight.bold,            
           ),
         ),

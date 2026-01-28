@@ -26,7 +26,7 @@ class HeaderWidget extends StatelessWidget {
                 'assets/icon/fuelprice_logo.png',
                 width: 150,
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 1),
               Text(
                 titulo,
                 style: const TextStyle(
@@ -39,11 +39,6 @@ class HeaderWidget extends StatelessWidget {
           ),
 
           const Spacer(),
-
-          IconButton(
-            icon: const Icon(Icons.settings, color: Colors.grey),
-            onPressed: () {},
-          ),
         ],
       ),
     );

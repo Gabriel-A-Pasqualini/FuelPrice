@@ -28,7 +28,7 @@ class FuelGaugeWidget extends StatelessWidget {
             //  'assets/images/carro.png',
             //  height: 120,
             //),
-            const SizedBox(height: 10),
+            const SizedBox(height: 1),
             Text(
               modeloCarro,
               style: TextStyle(
@@ -36,7 +36,7 @@ class FuelGaugeWidget extends StatelessWidget {
                 fontSize: 18
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 6),
             LinearProgressIndicator(
               value: nivel,
               minHeight: 16,
@@ -44,7 +44,7 @@ class FuelGaugeWidget extends StatelessWidget {
               backgroundColor: Colors.grey.shade300,
               valueColor: AlwaysStoppedAnimation(AppColors.primary),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Text("Tanque: ${(nivel * 100).toInt()}%",
               style: TextStyle(
                 fontWeight: FontWeight.bold,

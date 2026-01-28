@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:fuelprice/classes/ClassVeiculo.dart';
+import 'package:fuelprice/helper/DataBaseHelper.dart';
 
 class VeiculoController {
-  // Controllers dos campos do formulário
+  final _db = DatabaseHelper.instance;
+
   final nomeController = TextEditingController();
   final litrosController = TextEditingController();
   final gasolinaCidadeController = TextEditingController();
@@ -9,30 +12,78 @@ class VeiculoController {
   final etanolCidadeController = TextEditingController();
   final etanolEstradaController = TextEditingController();
 
-  // FormKey para validação
   final formKey = GlobalKey<FormState>();
 
-  void salvar(BuildContext context) {
+  int? _veiculoId; 
+
+  ClassVeiculo _criarVeiculo() {
+    return ClassVeiculo(
+      id: _veiculoId,
+      nome: nomeController.text.trim(),
+      litrosTanque: double.parse(litrosController.text),
+      gasolinaCidade: double.parse(gasolinaCidadeController.text),
+      gasolinaEstrada: double.parse(gasolinaEstradaController.text),
+      etanolCidade: double.parse(etanolCidadeController.text),
+      etanolEstrada: double.parse(etanolEstradaController.text),
+      favorita: false,
+    );
+  }
+
+  void _preencherCampos(ClassVeiculo veiculo) {
+    _veiculoId = veiculo.id;
+    nomeController.text = veiculo.nome;
+    litrosController.text = veiculo.litrosTanque.toString();
+    gasolinaCidadeController.text = veiculo.gasolinaCidade.toString();
+    gasolinaEstradaController.text = veiculo.gasolinaEstrada.toString();
+    etanolCidadeController.text = veiculo.etanolCidade.toString();
+    etanolEstradaController.text = veiculo.etanolEstrada.toString();
+  }
+
+  Future<void> salvar(BuildContext context) async {
     if (!formKey.currentState!.validate()) return;
 
-    final nome = nomeController.text;
-    final litros = double.parse(litrosController.text);
-    final gasolinaCidade = double.parse(gasolinaCidadeController.text);
-    final gasolinaEstrada = double.parse(gasolinaEstradaController.text);
-    final etanolCidade = double.parse(etanolCidadeController.text);
-    final etanolEstrada = double.parse(etanolEstradaController.text);
+    final veiculo = _criarVeiculo();
 
-    // Aqui você pode salvar, enviar para API, ou fazer o cálculo
-    debugPrint('🚗 Veículo salvo:');
-    debugPrint('Nome: $nome');
-    debugPrint('Tanque: $litros L');
-    debugPrint(
-        'Gasolina (Cidade/Estrada): $gasolinaCidade / $gasolinaEstrada');
-    debugPrint('Etanol (Cidade/Estrada): $etanolCidade / $etanolEstrada');
+    if (_veiculoId == null) {
+      await _db.insertVeiculo(veiculo);
+    } else {
+      await _db.updateVeiculo(veiculo);
+    }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Veículo '$nome' salvo com sucesso!")),
+      SnackBar(
+        content: Text("Veículo '${veiculo.nome}' salvo com sucesso!"),
+      ),
     );
+
+    limpar();
+  }
+
+  /// Buscar todos os veículos
+  Future<List<ClassVeiculo>> listarVeiculos() async {
+    return await _db.getVeiculos();
+  }
+
+  /// Carregar veículo para edição
+  void editar(ClassVeiculo veiculo) {
+    _preencherCampos(veiculo);
+  }
+
+  /// Marcar veículo como favorito
+  Future<void> definirFavorito(ClassVeiculo veiculo) async {
+    if (veiculo.id == null) return;
+    await _db.setFavorito(veiculo.id!);
+  }
+
+  /// Limpar formulário
+  void limpar() {
+    _veiculoId = null;
+    nomeController.clear();
+    litrosController.clear();
+    gasolinaCidadeController.clear();
+    gasolinaEstradaController.clear();
+    etanolCidadeController.clear();
+    etanolEstradaController.clear();
   }
 
   void dispose() {
