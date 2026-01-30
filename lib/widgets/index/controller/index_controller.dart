@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:fuelprice/helper/DataBaseHelper.dart';
-
 class IndexController extends ChangeNotifier {
   final DatabaseHelper db = DatabaseHelper.instance;
 
+  double kmRodadoDia = 0;
+  double litrosAtuais = 0;
+  double precoEtanol = 0;
+  double precoGasolina = 0;
 
   String nomeUsuario = '';
   String modeloCarro = '';
   double capacidadeTanque = 0;
   double consumoMedio = 0;
-  double litrosAtuais = 0;
   double kmPorDia = 0;
-  double precoEtanol = 0;
-  double precoGasolina = 0;
 
   bool carregando = true;
+
 
   Future<void> carregarDados() async {
     carregando = true;
@@ -35,7 +36,6 @@ class IndexController extends ChangeNotifier {
     consumoMedio =
         (veiculo.gasolinaCidade + veiculo.gasolinaEstrada) / 2;
 
-    kmPorDia = 35;
     carregando = false;
 
     notifyListeners();
@@ -45,6 +45,34 @@ class IndexController extends ChangeNotifier {
     litrosAtuais = capacidadeTanque;
     notifyListeners();
   }
+
+  Future<void> carregarConfiguracoes() async {
+    final config = await db.getPrecosCombustivel();
+    if (config == null) return;
+
+    kmRodadoDia = config.kmRodadoDia;
+    litrosAtuais = config.litrosAtuais;
+    precoEtanol = config.precoEtanol;
+    precoGasolina = config.precoGasolina;
+
+    notifyListeners();
+  }
+
+  Future<void> salvarConfiguracoes({
+    required double kmRodadoDia,
+    required double litrosAtuais,
+    required double precoEtanol,
+    required double precoGasolina,
+  }) async {
+
+    await db.salvarConfiguracoes(
+      kmRodadoDia: kmRodadoDia,
+      litrosAtuais: litrosAtuais,
+      precoEtanol: precoEtanol,
+      precoGasolina: precoGasolina,
+    );
+  }
+
 
   Future<void> carregarPrecos() async {
     final precos = await db.getPrecosCombustivel();
@@ -75,8 +103,8 @@ class IndexController extends ChangeNotifier {
       litrosAtuais * consumoMedio;
 
   int get diasRestantes {
-    if (kmPorDia == 0) return 0;
-    return (autonomiaKm / kmPorDia).floor();
+    if (kmRodadoDia == 0) return 0;
+    return (autonomiaKm / kmRodadoDia).floor();
   }
   double get litrosFaltantes {
     final faltante = capacidadeTanque - litrosAtuais;

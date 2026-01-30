@@ -38,7 +38,7 @@ class FuelCompareCard extends StatelessWidget {
               cor: alcoolVencedor
                   ? AppColors.primary
                   : AppColors.appMainColor,
-              proximo: "R\$ ${litrosTanque * alcoolPreco}",
+              proximo: "R\$ ${(litrosTanque * alcoolPreco).toStringAsFixed(2)}",
             ),
             const SizedBox(width: 12),
             _card(
@@ -49,7 +49,7 @@ class FuelCompareCard extends StatelessWidget {
               cor: gasolinaVencedor
                   ? AppColors.primary
                   : AppColors.appMainColor,
-              proximo: "R\$ ${litrosTanque * gasolinaPreco}",
+              proximo: "R\$ ${(litrosTanque * gasolinaPreco).toStringAsFixed(2)}",
             ),
           ],
         ),

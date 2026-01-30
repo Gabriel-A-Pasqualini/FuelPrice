@@ -7,7 +7,8 @@ import 'package:fuelprice/widgets/index/view/widgets/fuel_gauge_widget.dart';
 import 'package:fuelprice/widgets/index/view/widgets/fuel_summary_card.dart';
 import 'package:fuelprice/widgets/index/view/widgets/header_widget.dart';
 import 'package:fuelprice/widgets/tracking/view/tracking_view.dart';
-import 'package:fuelprice/widgets/veiculo/view/veiculo_view.dart';
+import 'package:fuelprice/widgets/veiculo/cadastro/view/veiculo_view.dart';
+import 'package:fuelprice/widgets/veiculo/listagem/veiculos_list_view.dart.dart';
 
 class IndexPage extends StatefulWidget {
   const IndexPage({super.key});
@@ -19,17 +20,13 @@ class IndexPage extends StatefulWidget {
 class _IndexPage extends State<IndexPage> {
   int _currentIndex = 0;
   late final IndexController controller;
-
   late final List<Widget> _pages;
 
   @override
   void initState() {
-    super.initState();
-
+    super.initState();    
     controller = IndexController();
-    controller.carregarDados();
-    controller.carregarPrecos();
-
+    carregaDados();
     _pages = [
       _homePage(),
       const CalculadoraCombustivelWidget(),
@@ -64,7 +61,8 @@ class _IndexPage extends State<IndexPage> {
                 IconButton(
                   icon: const Icon(Icons.settings, color: Colors.grey),
                   onPressed: () {
-                    _abrirAjusteTanque(context, controller);
+                    controller.carregarPrecos();
+                    _abrirAjustes(context, controller);
                   },
                 ),                   
                 const SizedBox(height: 10),               
@@ -110,6 +108,11 @@ class _IndexPage extends State<IndexPage> {
         unselectedItemColor: Colors.grey,
         type: BottomNavigationBarType.fixed,
         onTap: (index) {
+          if (index == 3) {
+            _abrirMenuVeiculos();
+            return;
+          }
+
           setState(() => _currentIndex = index);
         },
         items: const [
@@ -127,7 +130,7 @@ class _IndexPage extends State<IndexPage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.directions_car_rounded),
-            label: "Mapas",
+            label: "Veiculos",
           ),          
           BottomNavigationBarItem(
             icon: Icon(Icons.more_horiz),
@@ -138,58 +141,126 @@ class _IndexPage extends State<IndexPage> {
     );
   }
 
-  void _abrirAjusteTanque(
-    BuildContext context,
-    IndexController controller,
-  ) {
-    final TextEditingController litrosController =
-        TextEditingController(text: controller.litrosAtuais.toString());
-
-    showDialog(
+  void _abrirMenuVeiculos() {
+    showModalBottomSheet(
       context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (_) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Text(
-            'Quantidade atual no tanque',
-            textAlign: TextAlign.center,
-          ),
-          content: TextField(
-            controller: litrosController,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              labelText: 'Litros atuais',
-              hintText:
-                  'Máx: ${controller.capacidadeTanque.toStringAsFixed(0)} L',
-              border: const OutlineInputBorder(),
-            ),
-          ),
-          actionsAlignment: MainAxisAlignment.spaceBetween,
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancelar'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final litros = double.tryParse(litrosController.text);
-
-                controller.carregarPrecos();
-
-                if (litros != null) {
-                  controller.atualizarLitrosAtuais(litros);
+        return Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.list),
+                title: const Text("Listar veículos"),
+                onTap: () {
                   Navigator.pop(context);
-                }
-              },
-              child: const Text('Salvar'),
-            ),
-          ],
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const VeiculosListView(),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.add),
+                title: const Text("Cadastrar veículo"),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const VeiculoWidget(),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         );
       },
     );
   }
 
+  void _abrirAjustes(
+    BuildContext context,
+    IndexController controller,
+  ) {    
+    final kmController =
+        TextEditingController(text: controller.kmRodadoDia.toString());
+    final litrosController =
+        TextEditingController(text: controller.litrosAtuais.toString());
+    final etanolController =
+        TextEditingController(text: controller.precoEtanol.toString());
+    final gasolinaController =
+        TextEditingController(text: controller.precoGasolina.toString());
 
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: const Text(
+          'Configurações',
+          textAlign: TextAlign.center,
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            children: [
+              _input('Km rodado por dia', kmController),
+              _input('Litros atuais no tanque', litrosController),
+              _input('Preço do Etanol', etanolController),
+              _input('Preço da Gasolina', gasolinaController),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              await controller.salvarConfiguracoes(
+                kmRodadoDia: double.parse(kmController.text.replaceAll(',', '.')),
+                litrosAtuais: double.parse(litrosController.text.replaceAll(',', '.')),
+                precoEtanol: double.parse(etanolController.text.replaceAll(',', '.')),
+                precoGasolina: double.parse(gasolinaController.text.replaceAll(',', '.')),
+              );
+
+              controller.carregarDados();
+
+              Navigator.pop(context);
+            },
+            child: const Text('Salvar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _input(String label, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: TextField(
+        controller: controller,
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+        ),
+      ),
+    );
+  }
+
+  void carregaDados(){
+    controller.carregarConfiguracoes();
+    controller.carregarDados();
+    controller.carregarPrecos();    
+  }
 }

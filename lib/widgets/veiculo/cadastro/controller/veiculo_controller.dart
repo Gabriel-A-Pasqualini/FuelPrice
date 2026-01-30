@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:fuelprice/classes/ClassVeiculo.dart';
+import 'package:fuelprice/data/classes/ClassVeiculo.dart';
 import 'package:fuelprice/helper/DataBaseHelper.dart';
 
 class VeiculoController {
   final _db = DatabaseHelper.instance;
 
-  final nomeController = TextEditingController();
   final litrosController = TextEditingController();
   final gasolinaCidadeController = TextEditingController();
   final gasolinaEstradaController = TextEditingController();
   final etanolCidadeController = TextEditingController();
   final etanolEstradaController = TextEditingController();
+  final TextEditingController placaController = TextEditingController();
+  ClassVeiculo? veiculoPlaca;
+  final modeloController = TextEditingController();
+  final TextEditingController nomeController = TextEditingController();
+
+
 
   final formKey = GlobalKey<FormState>();
 
@@ -19,14 +24,41 @@ class VeiculoController {
   ClassVeiculo _criarVeiculo() {
     return ClassVeiculo(
       id: _veiculoId,
-      nome: nomeController.text.trim(),
+      nome: nomeController.text.trim().isNotEmpty
+          ? nomeController.text.trim()
+          : modeloController.text.trim(),
+
       litrosTanque: double.parse(litrosController.text),
       gasolinaCidade: double.parse(gasolinaCidadeController.text),
       gasolinaEstrada: double.parse(gasolinaEstradaController.text),
       etanolCidade: double.parse(etanolCidadeController.text),
       etanolEstrada: double.parse(etanolEstradaController.text),
+
       favorita: false,
+
+      placaAntiga: veiculoPlaca?.placaAntiga,
+      placaNova: veiculoPlaca?.placaNova,
+      marcaModelo: veiculoPlaca?.marcaModelo,
+      ano: veiculoPlaca?.ano,
+      cor: veiculoPlaca?.cor,
+      renavam: veiculoPlaca?.renavam,
+      chassi: veiculoPlaca?.chassi,
+      codigoMotor: veiculoPlaca?.codigoMotor,
+      combustivel: veiculoPlaca?.combustivel,
+      tipo: veiculoPlaca?.tipo,
+      procedencia: veiculoPlaca?.procedencia,
+      carroceria: veiculoPlaca?.carroceria,
+      cidade: veiculoPlaca?.cidade,
+      estado: veiculoPlaca?.estado,
+      cilindradas: veiculoPlaca?.cilindradas,
+      potenciaCv: veiculoPlaca?.potenciaCv,
+      capacidadePassageiros: veiculoPlaca?.capacidadePassageiros,
     );
+  }
+
+  void preencherDadosPorPlaca(Map<String, dynamic> data) {
+    veiculoPlaca = ClassVeiculo.fromPlaca(data);
+    modeloController.text = veiculoPlaca?.marcaModelo ?? '';
   }
 
   void _preencherCampos(ClassVeiculo veiculo) {
@@ -50,14 +82,17 @@ class VeiculoController {
       await _db.updateVeiculo(veiculo);
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Veículo '${veiculo.nome}' salvo com sucesso!"),
-      ),
-    );
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Veículo '${veiculo.nome}' salvo com sucesso!"),
+        ),
+      );
+    }
 
     limpar();
   }
+
 
   /// Buscar todos os veículos
   Future<List<ClassVeiculo>> listarVeiculos() async {
@@ -75,10 +110,14 @@ class VeiculoController {
     await _db.setFavorito(veiculo.id!);
   }
 
-  /// Limpar formulário
   void limpar() {
     _veiculoId = null;
+
+    veiculoPlaca = null;
+
+    placaController.clear();
     nomeController.clear();
+    modeloController.clear();
     litrosController.clear();
     gasolinaCidadeController.clear();
     gasolinaEstradaController.clear();
@@ -86,7 +125,9 @@ class VeiculoController {
     etanolEstradaController.clear();
   }
 
+
   void dispose() {
+    placaController.dispose();
     nomeController.dispose();
     litrosController.dispose();
     gasolinaCidadeController.dispose();
