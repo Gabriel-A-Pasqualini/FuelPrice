@@ -16,3 +16,10 @@ FuelPrice is a Flutter mobile application designed to help users calculate fuel 
 - Google Maps / Geolocation services
 - Material Design
 - State management and navigation using Flutter best practices
+- Docker
+
+## 🐳 Docker
+
+See the complete Docker setup guide in:
+👉 docs/docker.md
+
