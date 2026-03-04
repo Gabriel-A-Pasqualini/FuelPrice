@@ -12,3 +12,7 @@ env: basicamente utilizado na descrição de modificações ou adições em arqu
 
 -- Altera icone
 dart run flutter_launcher_icons
+
+-- Run Docker
+docker build -t fuelprice-flutter .
+docker compose build --no-cache
