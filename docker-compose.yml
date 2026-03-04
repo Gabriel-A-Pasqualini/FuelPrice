@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  flutter:
+    build: .
+    container_name: fuelprice_flutter
+    volumes:
+      - .:/app
+    working_dir: /app
+    tty: true
