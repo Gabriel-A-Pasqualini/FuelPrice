@@ -1,6 +1,5 @@
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as parser;
-import 'package:html/dom.dart';
 
 class VehicleRemoteDatasource {
   Future<Map<String, String?>> fetchVehicleInfo(String plate) async {
@@ -9,8 +8,7 @@ class VehicleRemoteDatasource {
     final response = await http.get(
       url,
       headers: {
-        'user-agent':
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
       },
     );
 
