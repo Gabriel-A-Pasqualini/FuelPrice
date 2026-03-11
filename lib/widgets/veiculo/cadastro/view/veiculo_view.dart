@@ -35,11 +35,8 @@ class _VeiculoWidgetState extends State<VeiculoWidget> {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: HeaderWidget(
-                titulo: "Cadastro de Veículo",
-              ),
+              child: HeaderWidget(titulo: "Cadastro de Veículo"),
             ),
-
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
@@ -48,23 +45,25 @@ class _VeiculoWidgetState extends State<VeiculoWidget> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
-                    TextFormField(
-                      controller: controller.placaController,
-                      textCapitalization: TextCapitalization.characters,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9]')),
-                        UpperCaseTextFormatter(),
-                      ],
-                      decoration: const InputDecoration(
-                        labelText: "Placa do veículo",
-                        hintText: "ABC1D23",
-                        border: OutlineInputBorder(),
+                      /// PLACA
+                      TextFormField(
+                        controller: controller.placaController,
+                        textCapitalization: TextCapitalization.characters,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                            RegExp(r'[A-Za-z0-9]'),
+                          ),
+                          UpperCaseTextFormatter(),
+                        ],
+                        decoration: const InputDecoration(
+                          labelText: "Placa do veículo",
+                          hintText: "ABC1D23",
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (value) => value == null || value.isEmpty
+                            ? "Informe a placa"
+                            : null,
                       ),
-                      validator: (value) =>
-                          value == null || value.isEmpty ? "Informe a placa" : null,
-                    ),
-
 
                       const SizedBox(height: 12),
 
@@ -95,11 +94,16 @@ class _VeiculoWidgetState extends State<VeiculoWidget> {
                         ),
                       ),
 
+                      const SizedBox(height: 12),
+
+                      /// MODELO
                       smoothInput(
                         controller: controller.modeloController,
                         label: "Modelo",
+                        inputFormatters: [],
                       ),
-                      
+
+                      /// INFO VEÍCULO
                       if (controller.veiculoPlaca != null) ...[
                         const SizedBox(height: 16),
                         Container(
@@ -117,14 +121,8 @@ class _VeiculoWidgetState extends State<VeiculoWidget> {
                                 'Veículo',
                                 controller.veiculoPlaca!.marcaModelo,
                               ),
-                              _infoRow(
-                                'Ano',
-                                controller.veiculoPlaca!.ano,
-                              ),
-                              _infoRow(
-                                'Cor',
-                                controller.veiculoPlaca!.cor,
-                              ),
+                              _infoRow('Ano', controller.veiculoPlaca!.ano),
+                              _infoRow('Cor', controller.veiculoPlaca!.cor),
                             ],
                           ),
                         ),
@@ -132,15 +130,18 @@ class _VeiculoWidgetState extends State<VeiculoWidget> {
 
                       const SizedBox(height: 24),
 
-                      /// LITROS NO TANQUE
+                      /// LITROS TANQUE
                       smoothInput(
                         controller: controller.litrosController,
                         label: "Litros no tanque (L)",
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+                        ],
                       ),
 
                       const SizedBox(height: 24),
 
-                      /// GASOLINA
+                      /// CONSUMO GASOLINA
                       Text(
                         "Consumo com Gasolina (km/L)",
                         style: theme.textTheme.titleMedium!.copyWith(
@@ -148,23 +149,32 @@ class _VeiculoWidgetState extends State<VeiculoWidget> {
                           fontSize: 18,
                         ),
                       ),
+
                       const SizedBox(height: 8),
 
                       Row(
                         children: [
                           Expanded(
                             child: smoothInput(
-                              controller:
-                                  controller.gasolinaCidadeController,
+                              controller: controller.gasolinaCidadeController,
                               label: "Cidade",
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                  RegExp(r'[0-9.,]'),
+                                ),
+                              ],
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: smoothInput(
-                              controller:
-                                  controller.gasolinaEstradaController,
+                              controller: controller.gasolinaEstradaController,
                               label: "Estrada",
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                  RegExp(r'[0-9.,]'),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -172,7 +182,7 @@ class _VeiculoWidgetState extends State<VeiculoWidget> {
 
                       const SizedBox(height: 24),
 
-                      /// ETANOL
+                      /// CONSUMO ETANOL
                       Text(
                         "Consumo com Etanol (km/L)",
                         style: theme.textTheme.titleMedium!.copyWith(
@@ -180,6 +190,7 @@ class _VeiculoWidgetState extends State<VeiculoWidget> {
                           fontSize: 18,
                         ),
                       ),
+
                       const SizedBox(height: 8),
 
                       Row(
@@ -188,14 +199,23 @@ class _VeiculoWidgetState extends State<VeiculoWidget> {
                             child: smoothInput(
                               controller: controller.etanolCidadeController,
                               label: "Cidade",
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                  RegExp(r'[0-9.,]'),
+                                ),
+                              ],
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: smoothInput(
-                              controller:
-                                  controller.etanolEstradaController,
+                              controller: controller.etanolEstradaController,
                               label: "Estrada",
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                  RegExp(r'[0-9.,]'),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -203,7 +223,7 @@ class _VeiculoWidgetState extends State<VeiculoWidget> {
 
                       const SizedBox(height: 32),
 
-                      /// SALVAR
+                      /// BOTÃO SALVAR
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
@@ -214,8 +234,7 @@ class _VeiculoWidgetState extends State<VeiculoWidget> {
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: appColor,
-                            padding:
-                                const EdgeInsets.symmetric(vertical: 14),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
                             textStyle: const TextStyle(fontSize: 18),
                           ),
                           onPressed: () => controller.salvar(context),
@@ -252,12 +271,7 @@ class _VeiculoWidgetState extends State<VeiculoWidget> {
               ),
             ),
           ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 15),
-            ),
-          ),
+          Expanded(child: Text(value, style: const TextStyle(fontSize: 15))),
         ],
       ),
     );

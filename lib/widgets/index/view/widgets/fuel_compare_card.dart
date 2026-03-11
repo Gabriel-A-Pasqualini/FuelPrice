@@ -1,31 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:fuelprice/helper/DataBaseHelper.dart';
 import 'package:fuelprice/helper/colors_helper.dart';
+
 class FuelCompareCard extends StatelessWidget {
   final double alcoolPreco;
   final double gasolinaPreco;
   final double litrosTanque;
-  
+
   const FuelCompareCard({
-    super.key, 
-    required this.alcoolPreco, 
-    required this.gasolinaPreco, 
-    required this.litrosTanque
+    super.key,
+    required this.alcoolPreco,
+    required this.gasolinaPreco,
+    required this.litrosTanque,
   });
 
   @override
   Widget build(BuildContext context) {
+    final relacao = alcoolPreco / gasolinaPreco;
+    final etanolVencedor = relacao < 0.7;
+    final gasolinaVencedor = !etanolVencedor;
 
-    final DatabaseHelper db = DatabaseHelper.instance;
-    final alcoolVencedor = alcoolPreco < gasolinaPreco;
-    final gasolinaVencedor = gasolinaPreco < alcoolPreco;
+    String formatMoney(double valor) {
+      return valor.toStringAsFixed(2).replaceAll('.', ',');
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Melhor Combustível",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final fontSize = constraints.maxWidth * 0.08;
+            return Text(
+              "Melhor Combustível",
+              style: TextStyle(
+                fontSize: fontSize.clamp(16.0, 22.0),
+                fontWeight: FontWeight.bold,
+              ),
+            );
+          },
         ),
         const SizedBox(height: 12),
         Row(
@@ -33,12 +45,10 @@ class FuelCompareCard extends StatelessWidget {
             _card(
               titulo: "Etanol",
               preco: alcoolPreco,
-              destaque: alcoolVencedor,
+              destaque: etanolVencedor,
               icone: Icons.local_gas_station,
-              cor: alcoolVencedor
-                  ? AppColors.primary
-                  : AppColors.appMainColor,
-              proximo: "R\$ ${(litrosTanque * alcoolPreco).toStringAsFixed(2)}",
+              cor: etanolVencedor ? AppColors.primary : AppColors.appMainColor,
+              proximo: "R\$ ${formatMoney(litrosTanque * alcoolPreco)}",
             ),
             const SizedBox(width: 12),
             _card(
@@ -49,14 +59,13 @@ class FuelCompareCard extends StatelessWidget {
               cor: gasolinaVencedor
                   ? AppColors.primary
                   : AppColors.appMainColor,
-              proximo: "R\$ ${(litrosTanque * gasolinaPreco).toStringAsFixed(2)}",
+              proximo: "R\$ ${formatMoney(litrosTanque * gasolinaPreco)}",
             ),
           ],
         ),
       ],
     );
   }
-
 
   Widget _card({
     required String titulo,
@@ -66,84 +75,100 @@ class FuelCompareCard extends StatelessWidget {
     required Color cor,
     required String proximo,
   }) {
+    String formatMoney(double valor) =>
+        valor.toStringAsFixed(2).replaceAll('.', ',');
+
     return Expanded(
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              cor.withOpacity(0.25),
-              cor.withOpacity(0.20),
-            ],
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // ⚡ Dinâmico: escala baseada na largura do card
+          final cardWidth = constraints.maxWidth;
+          final iconSize = cardWidth * 0.18; // ícone proporcional
+          final titleFont = cardWidth * 0.12;
+          final priceFont = cardWidth * 0.11;
+          final labelFont = cardWidth * 0.09;
+          final nextFont = cardWidth * 0.10;
+
+          return Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(18),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [cor.withOpacity(0.25), cor.withOpacity(0.20)],
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CircleAvatar(
-                    backgroundColor: AppColors.background,
-                    child: Icon(icone, color: cor),
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: iconSize / 2, // metade do tamanho do ícone
+                        backgroundColor: AppColors.background,
+                        child: Icon(icone, color: cor, size: iconSize),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          titulo,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: titleFont.clamp(12.0, 18.0),
+                          ),
+                        ),
+                      ),
+                      if (destaque)
+                        Icon(
+                          Icons.check_circle,
+                          color: Colors.green,
+                          size: iconSize * 0.6,
+                        ),
+                    ],
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
+                  const SizedBox(height: 12),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: cor,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     child: Text(
-                      titulo,
-                      style: const TextStyle(
+                      "R\$ ${formatMoney(preco)}/L",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        color: destaque ? Colors.white : Colors.black87,
+                        fontSize: priceFont.clamp(14.0, 18.0),
                       ),
                     ),
                   ),
-                  if (destaque)
-                    const Icon(Icons.check_circle, color: Colors.green),
+                  const SizedBox(height: 5),
+                  Text(
+                    "Próximo abastecimento completo:",
+                    style: TextStyle(
+                      fontSize: labelFont.clamp(12.0, 16.0),
+                      color: Colors.black54,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    proximo,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: nextFont.clamp(14.0, 18.0),
+                    ),
+                  ),
                 ],
               ),
-              const SizedBox(height: 12),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                decoration: BoxDecoration(
-                  color: cor,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  "R\$ ${preco.toStringAsFixed(2)}/L",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: destaque ? Colors.white : Colors.black87,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 5),
-              const Text(
-                "Próximo abastecimento completo:",
-                style: TextStyle(
-                  fontSize: 14, 
-                  color: Colors.black54,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                proximo,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
-
 }

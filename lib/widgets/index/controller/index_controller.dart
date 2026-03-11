@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fuelprice/helper/DataBaseHelper.dart';
+
 class IndexController extends ChangeNotifier {
   final DatabaseHelper db = DatabaseHelper.instance;
 
@@ -15,7 +16,6 @@ class IndexController extends ChangeNotifier {
   double kmPorDia = 0;
 
   bool carregando = true;
-
 
   Future<void> carregarDados() async {
     carregando = true;
@@ -33,8 +33,7 @@ class IndexController extends ChangeNotifier {
     modeloCarro = veiculo.nome;
     capacidadeTanque = veiculo.litrosTanque;
 
-    consumoMedio =
-        (veiculo.gasolinaCidade + veiculo.gasolinaEstrada) / 2;
+    consumoMedio = (veiculo.gasolinaCidade + veiculo.gasolinaEstrada) / 2;
 
     carregando = false;
 
@@ -64,7 +63,6 @@ class IndexController extends ChangeNotifier {
     required double precoEtanol,
     required double precoGasolina,
   }) async {
-
     await db.salvarConfiguracoes(
       kmRodadoDia: kmRodadoDia,
       litrosAtuais: litrosAtuais,
@@ -73,7 +71,6 @@ class IndexController extends ChangeNotifier {
     );
   }
 
-
   Future<void> carregarPrecos() async {
     final precos = await db.getPrecosCombustivel();
 
@@ -81,7 +78,7 @@ class IndexController extends ChangeNotifier {
     precoGasolina = precos?.precoGasolina ?? 0;
 
     notifyListeners();
-  }  
+  }
 
   void atualizarLitrosAtuais(double valor) {
     if (valor < 0) valor = 0;
@@ -96,20 +93,19 @@ class IndexController extends ChangeNotifier {
     return litrosAtuais / capacidadeTanque;
   }
 
-  int get porcentagemTanque =>
-      (nivelTanqueAtual * 100).round();
+  int get porcentagemTanque => (nivelTanqueAtual * 100).round();
 
-  double get autonomiaKm =>
-      litrosAtuais * consumoMedio;
+  double get autonomiaKm => litrosAtuais * consumoMedio;
 
   int get diasRestantes {
     if (kmRodadoDia == 0) return 0;
     return (autonomiaKm / kmRodadoDia).floor();
   }
+
   double get litrosFaltantes {
     final faltante = capacidadeTanque - litrosAtuais;
     return faltante < 0 ? 0 : faltante;
   }
-  double get estimativaAbastecimento =>
-      litrosFaltantes * precoEtanol;
+
+  double get estimativaAbastecimento => litrosFaltantes * precoEtanol;
 }

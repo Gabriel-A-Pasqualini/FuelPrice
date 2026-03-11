@@ -14,16 +14,16 @@ class CalculadoraController {
     required VoidCallback onUpdate,
     required BuildContext context,
   }) async {
-    final precoEtanol =
-        double.tryParse(etanolText.replaceAll(',', '.')) ?? 0;
+    final precoEtanol = double.tryParse(etanolText.replaceAll(',', '.')) ?? 0;
     final precoGasolina =
         double.tryParse(gasolinaText.replaceAll(',', '.')) ?? 0;
-    final valorAbastecer =
-        double.tryParse(valorText.replaceAll(',', '.')) ?? 0;
+    final valorAbastecer = double.tryParse(valorText.replaceAll(',', '.')) ?? 0;
 
     if (precoEtanol <= 0 || precoGasolina <= 0 || valorAbastecer <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("⚠️ Preencha todos os campos corretamente.")),
+        const SnackBar(
+          content: Text("⚠️ Preencha todos os campos corretamente."),
+        ),
       );
       return;
     }
@@ -51,9 +51,12 @@ class CalculadoraController {
     final relacao = precoEtanol / precoGasolina;
 
     final kmEtanolCidade = (valorAbastecer / precoEtanol) * consumoEtanolCidade;
-    final kmEtanolEstrada = (valorAbastecer / precoEtanol) * consumoEtanolEstrada;
-    final kmGasolinaCidade = (valorAbastecer / precoGasolina) * consumoGasolinaCidade;
-    final kmGasolinaEstrada = (valorAbastecer / precoGasolina) * consumoGasolinaEstrada;
+    final kmEtanolEstrada =
+        (valorAbastecer / precoEtanol) * consumoEtanolEstrada;
+    final kmGasolinaCidade =
+        (valorAbastecer / precoGasolina) * consumoGasolinaCidade;
+    final kmGasolinaEstrada =
+        (valorAbastecer / precoGasolina) * consumoGasolinaEstrada;
 
     final custoKmEtanolCidade = precoEtanol / consumoEtanolCidade;
     final custoKmEtanolEstrada = precoEtanol / consumoEtanolEstrada;
@@ -68,11 +71,13 @@ class CalculadoraController {
     final economiaCidadeKm = (kmGasolinaCidade - kmEtanolCidade).abs();
     final economiaEstradaKm = (kmGasolinaEstrada - kmEtanolEstrada).abs();
 
-    final economiaCidadeReais = economiaCidadeKm *
+    final economiaCidadeReais =
+        economiaCidadeKm *
         (custoKmEtanolCidade < custoKmGasolinaCidade
             ? custoKmEtanolCidade
             : custoKmGasolinaCidade);
-    final economiaEstradaReais = economiaEstradaKm *
+    final economiaEstradaReais =
+        economiaEstradaKm *
         (custoKmEtanolEstrada < custoKmGasolinaEstrada
             ? custoKmEtanolEstrada
             : custoKmGasolinaEstrada);
@@ -106,11 +111,15 @@ class CalculadoraController {
         "estradaKm": economiaEstradaKm,
         "cidadeR": economiaCidadeReais,
         "estradaR": economiaEstradaReais,
-      }
+      },
     };
 
     calculado = true;
     onUpdate();
+  }
+
+  double parseMoney(String value) {
+    return double.parse(value.replaceAll('.', '').replaceAll(',', '.'));
   }
 
   void limpar({

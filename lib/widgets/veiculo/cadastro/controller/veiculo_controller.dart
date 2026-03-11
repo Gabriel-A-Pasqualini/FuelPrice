@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fuelprice/data/classes/ClassVeiculo.dart';
 import 'package:fuelprice/helper/DataBaseHelper.dart';
+import 'package:fuelprice/widgets/veiculo/listagem/veiculos_list_view.dart.dart';
 
 class VeiculoController {
   final _db = DatabaseHelper.instance;
@@ -15,11 +16,9 @@ class VeiculoController {
   final modeloController = TextEditingController();
   final TextEditingController nomeController = TextEditingController();
 
-
-
   final formKey = GlobalKey<FormState>();
 
-  int? _veiculoId; 
+  int? _veiculoId;
 
   ClassVeiculo _criarVeiculo() {
     return ClassVeiculo(
@@ -83,16 +82,21 @@ class VeiculoController {
     }
 
     if (context.mounted) {
+      // Feedback de sucesso
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Veículo '${veiculo.nome}' salvo com sucesso!"),
-        ),
+        SnackBar(content: Text("Veículo '${veiculo.nome}' salvo com sucesso!")),
+      );
+
+      // Limpar campos
+      limpar();
+
+      // Navegar para a lista de veículos
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const VeiculosListView()),
       );
     }
-
-    limpar();
   }
-
 
   /// Buscar todos os veículos
   Future<List<ClassVeiculo>> listarVeiculos() async {
@@ -124,7 +128,6 @@ class VeiculoController {
     etanolCidadeController.clear();
     etanolEstradaController.clear();
   }
-
 
   void dispose() {
     placaController.dispose();
