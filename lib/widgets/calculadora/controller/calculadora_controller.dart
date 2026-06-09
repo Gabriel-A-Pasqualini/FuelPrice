@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:fuelprice/data/classes/calculadora/ClassCombustivelInfo.dart';
+import 'package:fuelprice/data/classes/calculadora/ClassEconomiaInfo.dart';
+import 'package:fuelprice/data/classes/calculadora/ClassResultadoCalculo.dart';
+import 'package:fuelprice/data/classes/ClassVeiculo.dart';
 import 'package:fuelprice/helper/DataBaseHelper.dart';
 
 class CalculadoraController {
   final DatabaseHelper db = DatabaseHelper.instance;
 
-  Map<String, dynamic>? resultado;
+  ResultadoCalculo? resultado;
   bool calculado = false;
 
   Future<void> calcular({
@@ -14,16 +18,18 @@ class CalculadoraController {
     required VoidCallback onUpdate,
     required BuildContext context,
   }) async {
-    final precoEtanol = double.tryParse(etanolText.replaceAll(',', '.')) ?? 0;
-    final precoGasolina =
-        double.tryParse(gasolinaText.replaceAll(',', '.')) ?? 0;
-    final valorAbastecer = double.tryParse(valorText.replaceAll(',', '.')) ?? 0;
+    final precoEtanol = _parseValor(etanolText);
+    final precoGasolina = _parseValor(gasolinaText);
+    final valorAbastecer = _parseValor(valorText);
 
-    if (precoEtanol <= 0 || precoGasolina <= 0 || valorAbastecer <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("⚠️ Preencha todos os campos corretamente."),
-        ),
+    if (_camposInvalidos(
+      precoEtanol,
+      precoGasolina,
+      valorAbastecer,
+    )) {
+      _mostrarMensagem(
+        context,
+        "⚠️ Preencha todos os campos corretamente.",
       );
       return;
     }
@@ -31,95 +37,202 @@ class CalculadoraController {
     final veiculo = await db.getVeiculoFavorito();
 
     if (veiculo == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("⚠️ Nenhum veículo cadastrado.")),
+      _mostrarMensagem(
+        context,
+        "⚠️ Nenhum veículo cadastrado.",
       );
       return;
     }
 
-    final consumoEtanolCidade = veiculo.etanolCidade;
-    final consumoEtanolEstrada = veiculo.etanolEstrada;
-    final consumoGasolinaCidade = veiculo.gasolinaCidade;
-    final consumoGasolinaEstrada = veiculo.gasolinaEstrada;
-    final tanqueLitros = veiculo.litrosTanque;
-
-    await db.salvarPrecosCombustivel(
-      etanol: precoEtanol,
-      gasolina: precoGasolina,
+    await _salvarUltimosPrecos(
+      precoEtanol,
+      precoGasolina,
     );
 
-    final relacao = precoEtanol / precoGasolina;
-
-    final kmEtanolCidade = (valorAbastecer / precoEtanol) * consumoEtanolCidade;
-    final kmEtanolEstrada =
-        (valorAbastecer / precoEtanol) * consumoEtanolEstrada;
-    final kmGasolinaCidade =
-        (valorAbastecer / precoGasolina) * consumoGasolinaCidade;
-    final kmGasolinaEstrada =
-        (valorAbastecer / precoGasolina) * consumoGasolinaEstrada;
-
-    final custoKmEtanolCidade = precoEtanol / consumoEtanolCidade;
-    final custoKmEtanolEstrada = precoEtanol / consumoEtanolEstrada;
-    final custoKmGasolinaCidade = precoGasolina / consumoGasolinaCidade;
-    final custoKmGasolinaEstrada = precoGasolina / consumoGasolinaEstrada;
-
-    final tanqueKmEtanolCidade = tanqueLitros * consumoEtanolCidade;
-    final tanqueKmEtanolEstrada = tanqueLitros * consumoEtanolEstrada;
-    final tanqueKmGasolinaCidade = tanqueLitros * consumoGasolinaCidade;
-    final tanqueKmGasolinaEstrada = tanqueLitros * consumoGasolinaEstrada;
-
-    final economiaCidadeKm = (kmGasolinaCidade - kmEtanolCidade).abs();
-    final economiaEstradaKm = (kmGasolinaEstrada - kmEtanolEstrada).abs();
-
-    final economiaCidadeReais =
-        economiaCidadeKm *
-        (custoKmEtanolCidade < custoKmGasolinaCidade
-            ? custoKmEtanolCidade
-            : custoKmGasolinaCidade);
-    final economiaEstradaReais =
-        economiaEstradaKm *
-        (custoKmEtanolEstrada < custoKmGasolinaEstrada
-            ? custoKmEtanolEstrada
-            : custoKmGasolinaEstrada);
-
-    final melhorCombustivel = relacao < 0.7 ? "ETANOL" : "GASOLINA";
-
-    resultado = {
-      "relacao": relacao,
-      "melhor": melhorCombustivel,
-      "valor": valorAbastecer,
-      "km": {
-        "etanolCidade": kmEtanolCidade,
-        "etanolEstrada": kmEtanolEstrada,
-        "gasolinaCidade": kmGasolinaCidade,
-        "gasolinaEstrada": kmGasolinaEstrada,
-      },
-      "custoKm": {
-        "etanolCidade": custoKmEtanolCidade,
-        "etanolEstrada": custoKmEtanolEstrada,
-        "gasolinaCidade": custoKmGasolinaCidade,
-        "gasolinaEstrada": custoKmGasolinaEstrada,
-      },
-      "tanque": {
-        "etanolCidade": tanqueKmEtanolCidade,
-        "etanolEstrada": tanqueKmEtanolEstrada,
-        "gasolinaCidade": tanqueKmGasolinaCidade,
-        "gasolinaEstrada": tanqueKmGasolinaEstrada,
-      },
-      "economia": {
-        "cidadeKm": economiaCidadeKm,
-        "estradaKm": economiaEstradaKm,
-        "cidadeR": economiaCidadeReais,
-        "estradaR": economiaEstradaReais,
-      },
-    };
+    resultado = _gerarResultado(
+      veiculo,
+      precoEtanol,
+      precoGasolina,
+      valorAbastecer,
+    );
 
     calculado = true;
     onUpdate();
   }
 
-  double parseMoney(String value) {
-    return double.parse(value.replaceAll('.', '').replaceAll(',', '.'));
+  Future<void> _salvarUltimosPrecos(
+    double etanol,
+    double gasolina,
+  ) async {
+    await db.salvarPrecosCombustivel(
+      etanol: etanol,
+      gasolina: gasolina,
+    );
+  }
+
+  ResultadoCalculo _gerarResultado(
+    ClassVeiculo veiculo,
+    double precoEtanol,
+    double precoGasolina,
+    double valorAbastecer,
+  ) {
+    final relacao = precoEtanol / precoGasolina;
+
+    final kmEtanolCidade = _calcularAutonomia(
+      valorAbastecer,
+      precoEtanol,
+      veiculo.etanolCidade,
+    );
+
+    final kmEtanolEstrada = _calcularAutonomia(
+      valorAbastecer,
+      precoEtanol,
+      veiculo.etanolEstrada,
+    );
+
+    final kmGasolinaCidade = _calcularAutonomia(
+      valorAbastecer,
+      precoGasolina,
+      veiculo.gasolinaCidade,
+    );
+
+    final kmGasolinaEstrada = _calcularAutonomia(
+      valorAbastecer,
+      precoGasolina,
+      veiculo.gasolinaEstrada,
+    );
+
+    final custoKmEtanolCidade = _calcularCustoKm(
+      precoEtanol,
+      veiculo.etanolCidade,
+    );
+
+    final custoKmEtanolEstrada = _calcularCustoKm(
+      precoEtanol,
+      veiculo.etanolEstrada,
+    );
+
+    final custoKmGasolinaCidade = _calcularCustoKm(
+      precoGasolina,
+      veiculo.gasolinaCidade,
+    );
+
+    final custoKmGasolinaEstrada = _calcularCustoKm(
+      precoGasolina,
+      veiculo.gasolinaEstrada,
+    );
+
+    final economiaCidadeKm =
+        (kmGasolinaCidade - kmEtanolCidade).abs();
+
+    final economiaEstradaKm =
+        (kmGasolinaEstrada - kmEtanolEstrada).abs();
+
+    final economiaCidadeReais =
+        economiaCidadeKm *
+        _menorValor(
+          custoKmEtanolCidade,
+          custoKmGasolinaCidade,
+        );
+
+    final economiaEstradaReais =
+        economiaEstradaKm *
+        _menorValor(
+          custoKmEtanolEstrada,
+          custoKmGasolinaEstrada,
+        );
+
+    return ResultadoCalculo(
+      relacao: relacao,
+      melhorCombustivel: _obterMelhorCombustivel(relacao),
+      valorAbastecido: valorAbastecer,
+
+      km: CombustivelInfo(
+        etanolCidade: kmEtanolCidade,
+        etanolEstrada: kmEtanolEstrada,
+        gasolinaCidade: kmGasolinaCidade,
+        gasolinaEstrada: kmGasolinaEstrada,
+      ),
+
+      custoKm: CombustivelInfo(
+        etanolCidade: custoKmEtanolCidade,
+        etanolEstrada: custoKmEtanolEstrada,
+        gasolinaCidade: custoKmGasolinaCidade,
+        gasolinaEstrada: custoKmGasolinaEstrada,
+      ),
+
+      tanque: CombustivelInfo(
+        etanolCidade:
+            veiculo.litrosTanque * veiculo.etanolCidade,
+        etanolEstrada:
+            veiculo.litrosTanque * veiculo.etanolEstrada,
+        gasolinaCidade:
+            veiculo.litrosTanque * veiculo.gasolinaCidade,
+        gasolinaEstrada:
+            veiculo.litrosTanque * veiculo.gasolinaEstrada,
+      ),
+
+      economia: EconomiaInfo(
+        cidadeKm: economiaCidadeKm,
+        estradaKm: economiaEstradaKm,
+        cidadeReais: economiaCidadeReais,
+        estradaReais: economiaEstradaReais,
+      ),
+    );
+  }
+    
+  double _parseValor(String valor) {
+    return double.tryParse(
+          valor.replaceAll(',', '.'),
+        ) ??
+        0;
+  }
+
+  bool _camposInvalidos(
+    double etanol,
+    double gasolina,
+    double valor,
+  ) {
+    return etanol <= 0 ||
+        gasolina <= 0 ||
+        valor <= 0;
+  }
+
+  double _calcularAutonomia(
+    double valorAbastecido,
+    double precoCombustivel,
+    double consumo,
+  ) {
+    return (valorAbastecido / precoCombustivel) * consumo;
+  }
+
+  double _calcularCustoKm(
+    double precoCombustivel,
+    double consumo,
+  ) {
+    return precoCombustivel / consumo;
+  }
+
+  double _menorValor(
+    double valor1,
+    double valor2,
+  ) {
+    return valor1 < valor2 ? valor1 : valor2;
+  }
+
+  String _obterMelhorCombustivel(double relacao) {
+    return relacao < 0.70
+        ? "ETANOL"
+        : "GASOLINA";
+  }
+
+  void _mostrarMensagem(
+    BuildContext context,
+    String mensagem,
+  ) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(mensagem)),
+    );
   }
 
   void limpar({
@@ -131,8 +244,10 @@ class CalculadoraController {
     etanolController.clear();
     gasolinaController.clear();
     valorController.clear();
+
     resultado = null;
     calculado = false;
+
     onUpdate();
   }
 }

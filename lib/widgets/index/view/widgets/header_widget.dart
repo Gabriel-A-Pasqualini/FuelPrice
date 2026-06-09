@@ -24,9 +24,9 @@ class HeaderWidget extends StatelessWidget {
             children: [
               Image.asset(
                 'assets/icon/fuelprice_logo.png',
-                width: 150,
+                width: 100,
               ),
-              const SizedBox(height: 1),
+              const SizedBox(height: 10),
               Text(
                 titulo,
                 style: const TextStyle(
