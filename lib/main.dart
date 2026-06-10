@@ -1,7 +1,7 @@
 
 import 'package:fuelprice/helper/app_colors.dart';
 import 'package:fuelprice/services/background/tracking_service.dart';
-import 'package:fuelprice/widgets/index/view/index.dart';
+import 'package:fuelprice/modules/index/view/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 
@@ -15,8 +15,9 @@ Future<void> main() async {
   await service.configure(
     androidConfiguration: AndroidConfiguration(
       onStart: onStart,
-      isForegroundMode: true,
       autoStart: false,
+      isForegroundMode: true,
+      foregroundServiceNotificationId: 888,
     ),
     iosConfiguration: IosConfiguration(
       autoStart: false,

@@ -5,6 +5,8 @@ import 'package:geolocator/geolocator.dart';
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
   if (service is AndroidServiceInstance) {
+    service.setAsForegroundService();
+
     service.setForegroundNotificationInfo(
       title: "Rastreamento ativo",
       content: "Sua localização está sendo monitorada",
