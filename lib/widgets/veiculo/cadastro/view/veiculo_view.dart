@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fuelprice/data/classes/ClassUpperCaseTextFormatter.dart';
-import 'package:fuelprice/helper/colors_helper.dart';
-import 'package:fuelprice/services/vehicle_webview_scraper.dart';
+import 'package:fuelprice/data/classes/class_upper_case_text_formatter.dart';
+import 'package:fuelprice/helper/app_colors.dart';
+import 'package:fuelprice/services/vehicle_web_view_scraper.dart';
 import 'package:fuelprice/widgets/index/view/widgets/header_widget.dart';
 import 'package:fuelprice/widgets/veiculo/cadastro/controller/veiculo_controller.dart';
 import 'package:fuelprice/widgets/calculadora/widget/smooth_input.dart';

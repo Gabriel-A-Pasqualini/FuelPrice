@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fuelprice/data/classes/ClassVeiculo.dart';
-import 'package:fuelprice/helper/DataBaseHelper.dart';
+import 'package:fuelprice/data/classes/class_veiculo.dart';
+import 'package:fuelprice/helper/data_base_helper.dart';
 import 'package:fuelprice/widgets/veiculo/listagem/veiculos_list_view.dart.dart';
 
 class VeiculoController {

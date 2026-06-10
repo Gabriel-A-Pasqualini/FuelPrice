@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fuelprice/helper/colors_helper.dart';
+import 'package:fuelprice/helper/app_colors.dart';
 
 class HeaderWidget extends StatelessWidget {
   final String titulo;

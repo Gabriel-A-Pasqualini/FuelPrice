@@ -1,7 +1,7 @@
 import 'package:fuelprice/widgets/localizacao/controller/maps_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:fuelprice/helper/mapa_localizacao_helper.dart';
-import 'package:fuelprice/helper/colors_helper.dart';
+import 'package:fuelprice/helper/app_colors.dart';
 
 class MapsWidget extends StatefulWidget {
   const MapsWidget({super.key});

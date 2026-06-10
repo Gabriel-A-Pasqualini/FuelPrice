@@ -1,5 +1,5 @@
-import 'package:fuelprice/data/classes/ClassConfiguracao.dart';
-import 'package:fuelprice/data/classes/ClassVeiculo.dart';
+import 'package:fuelprice/data/classes/class_configuracao.dart';
+import 'package:fuelprice/data/classes/class_veiculo.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 

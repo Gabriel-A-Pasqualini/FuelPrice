@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fuelprice/widgets/calculadora/classes/ClassCombustivelInfo.dart';
-import 'package:fuelprice/widgets/calculadora/classes/ClassEconomiaInfo.dart';
-import 'package:fuelprice/widgets/calculadora/classes/ClassResultadoCalculo.dart';
-import 'package:fuelprice/data/classes/ClassVeiculo.dart';
-import 'package:fuelprice/helper/DataBaseHelper.dart';
+import 'package:fuelprice/widgets/calculadora/classes/class_combustivel_info.dart';
+import 'package:fuelprice/widgets/calculadora/classes/class_economia_info.dart';
+import 'package:fuelprice/widgets/calculadora/classes/class_resultado_calculo.dart';
+import 'package:fuelprice/data/classes/class_veiculo.dart';
+import 'package:fuelprice/helper/data_base_helper.dart';
 
 class CalculadoraController {
   final DatabaseHelper db = DatabaseHelper.instance;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fuelprice/widgets/calculadora/classes/ClassResultadoCalculo.dart';
-import 'package:fuelprice/helper/colors_helper.dart';
+import 'package:fuelprice/widgets/calculadora/classes/class_resultado_calculo.dart';
+import 'package:fuelprice/helper/app_colors.dart';
 import 'package:fuelprice/widgets/calculadora/widget/bloco_widget.dart';
 
 class ResumoGeralCard extends StatelessWidget {

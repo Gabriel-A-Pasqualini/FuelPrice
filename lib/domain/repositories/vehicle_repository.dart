@@ -1,5 +1,5 @@
-class VehicleInfo {
-  final Map<String, String?> data;
+import 'package:fuelprice/domain/entities/vehicle_entity.dart';
 
-  VehicleInfo(this.data);
+abstract class VehicleRepository {
+  Future<VehicleEntity> getVehicleInfo(String plate);
 }

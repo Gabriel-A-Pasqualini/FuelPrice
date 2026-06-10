@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fuelprice/helper/colors_helper.dart';
+import 'package:fuelprice/helper/app_colors.dart';
 
 Widget smoothInput({
   required TextEditingController controller,

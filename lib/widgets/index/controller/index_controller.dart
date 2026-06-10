@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fuelprice/helper/DataBaseHelper.dart';
+import 'package:fuelprice/helper/data_base_helper.dart';
 
 class IndexController extends ChangeNotifier {
   final DatabaseHelper db = DatabaseHelper.instance;

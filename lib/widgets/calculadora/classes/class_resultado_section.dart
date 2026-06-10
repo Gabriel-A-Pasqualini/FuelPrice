@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:fuelprice/widgets/calculadora/classes/ClassAutonomiaCard.dart';
-import 'package:fuelprice/widgets/calculadora/classes/ClassCustoKmCard.dart';
-import 'package:fuelprice/widgets/calculadora/classes/ClassEconomiaCard.dart';
-import 'package:fuelprice/widgets/calculadora/classes/ClassResultadoCalculo.dart';
-import 'package:fuelprice/widgets/calculadora/classes/ClassResumoGeralCard.dart';
-import 'package:fuelprice/widgets/calculadora/classes/ClassRodapeCalculadora.dart';
+import 'package:fuelprice/widgets/calculadora/classes/class_autonomia_card.dart';
+import 'package:fuelprice/widgets/calculadora/classes/class_custo_km_card.dart';
+import 'package:fuelprice/widgets/calculadora/classes/class_economia_card.dart';
+import 'package:fuelprice/widgets/calculadora/classes/class_resultado_calculo.dart';
+import 'package:fuelprice/widgets/calculadora/classes/class_resumo_geral_card.dart';
+import 'package:fuelprice/widgets/calculadora/classes/class_rodape_calculadora.dart';
 
 class ResultadoSection extends StatelessWidget {
   final bool calculado;

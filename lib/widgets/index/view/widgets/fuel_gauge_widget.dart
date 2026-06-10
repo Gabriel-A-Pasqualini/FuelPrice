@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fuelprice/helper/colors_helper.dart';
+import 'package:fuelprice/helper/app_colors.dart';
 
 class FuelGaugeWidget extends StatelessWidget {
   final double nivel;

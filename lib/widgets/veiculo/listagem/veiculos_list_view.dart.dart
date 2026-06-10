@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:fuelprice/data/classes/ClassVeiculo.dart';
-import 'package:fuelprice/helper/DataBaseHelper.dart';
-import 'package:fuelprice/helper/colors_helper.dart';
+import 'package:fuelprice/data/classes/class_veiculo.dart';
+import 'package:fuelprice/helper/data_base_helper.dart';
+import 'package:fuelprice/helper/app_colors.dart';
 import 'package:fuelprice/widgets/index/view/widgets/header_widget.dart';
 
 class VeiculosListView extends StatefulWidget {
