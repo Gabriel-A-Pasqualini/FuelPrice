@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:fuelprice/data/classes/calculadora/ClassAbastecimentoForm.dart';
-import 'package:fuelprice/data/classes/calculadora/ClassCalculadoraActions.dart';
-import 'package:fuelprice/data/classes/calculadora/ClassResultadoSection.dart';
+import 'package:fuelprice/widgets/calculadora/classes/ClassAbastecimentoForm.dart';
+import 'package:fuelprice/widgets/calculadora/classes/ClassCalculadoraActions.dart';
+import 'package:fuelprice/widgets/calculadora/classes/ClassResultadoSection.dart';
 import 'package:fuelprice/helper/colors_helper.dart';
 import 'package:fuelprice/widgets/calculadora/controller/calculadora_controller.dart';
 import 'package:fuelprice/widgets/index/view/widgets/header_widget.dart';

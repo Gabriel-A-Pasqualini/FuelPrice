@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:fuelprice/data/classes/calculadora/ClassCombustivelInfo.dart';
-import 'package:fuelprice/data/classes/calculadora/ClassEconomiaInfo.dart';
-import 'package:fuelprice/data/classes/calculadora/ClassResultadoCalculo.dart';
+import 'package:fuelprice/widgets/calculadora/classes/ClassCombustivelInfo.dart';
+import 'package:fuelprice/widgets/calculadora/classes/ClassEconomiaInfo.dart';
+import 'package:fuelprice/widgets/calculadora/classes/ClassResultadoCalculo.dart';
 import 'package:fuelprice/data/classes/ClassVeiculo.dart';
 import 'package:fuelprice/helper/DataBaseHelper.dart';
 

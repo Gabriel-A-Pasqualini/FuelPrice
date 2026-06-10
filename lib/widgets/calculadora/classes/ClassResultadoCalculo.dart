@@ -1,5 +1,5 @@
-import 'package:fuelprice/data/classes/calculadora/ClassCombustivelInfo.dart';
-import 'package:fuelprice/data/classes/calculadora/ClassEconomiaInfo.dart';
+import 'package:fuelprice/widgets/calculadora/classes/ClassCombustivelInfo.dart';
+import 'package:fuelprice/widgets/calculadora/classes/ClassEconomiaInfo.dart';
 
 class ResultadoCalculo {
   final double relacao;

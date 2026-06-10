@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fuelprice/data/classes/calculadora/ClassResultadoCalculo.dart';
+import 'package:fuelprice/widgets/calculadora/classes/ClassResultadoCalculo.dart';
 import 'package:fuelprice/widgets/calculadora/widget/bloco_widget.dart';
 
 class AutonomiaCard extends StatelessWidget {

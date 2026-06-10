@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fuelprice/helper/DataBaseHelper.dart';
 import 'package:fuelprice/helper/colors_helper.dart';
 
 class FuelCompareCard extends StatelessWidget {
